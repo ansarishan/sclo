@@ -84,11 +84,13 @@ const Terrain = () => {
 const App = () => {
   const [height, setHeight] = useState(0)
   const [values, setValues] = useState({
-    boxHeight: 2,
-    boxLength: 3,
-    boxWidth: 4,
+    boxHeight: 1,
+    boxLength: 1,
+    boxWidth: 1,
     noOfBoxes: 1,
-    xDistance: 5,
+    xDistance: -10,
+    yDistance: 0,
+    zDistance: -10,
     positions: [],
     boxes: []
   })
@@ -102,14 +104,29 @@ const App = () => {
   var d = 0;
   const addBoxes = (e) => {
     e.preventDefault()
-    let x = values.xDistance + 5;
-    setValues({ ...values, boxes: [...values.boxes, { position: [values.xDistance, 0, 0], size: [values.boxWidth, values.boxHeight, values.boxLength] }], xDistance: x });
+    let x = values.xDistance;// + 1.5;
+    let y = values.yDistance;// + 1.5;
+    let z = values.zDistance;// + 1.5;
+    if(values.zDistance>9){
+      z = -10;
+     // x = values.xDistance + 1.5;
+      y = values.yDistance+1.5;
+     if(y>6){
+      y = 0;
+      x = values.xDistance + 1.5;
+     }
+    }
+    else {
+      z = values.zDistance  + 1.5;
+    }
+
+    setValues({ ...values, boxes: [...values.boxes, { position: [values.xDistance, values.yDistance, values.zDistance], size: [values.boxWidth, values.boxHeight, values.boxLength] }], xDistance: x , yDistance: y, zDistance: z });
 
   }
   var camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight,1, 10000 );
   camera.position.set( 500, 500, 1300 );
  // camera.lookAt( 0, 0, 0 );
-  camera.zoom=200
+  camera.zoom=100
   // var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
 	// 			geometry.rotateX( - Math.PI / 2 );
   return (
@@ -124,6 +141,10 @@ const App = () => {
 
         No. of Boxes:<input type="text" value={values.noOfBoxes} onChange={handleChange("noOfBoxes")} />
         <button type="submit" >Submit </button>
+        <hr>
+        
+        </hr>
+        Current X: {values.xDistance} | Current Y: {values.yDistance} | Current Z: {values.zDistance}
       </form>
       <div ref={ref}>
         <Canvas style={{height:500,width:800}}

@@ -1,8 +1,10 @@
 
 import React, { useRef, useState, Fragment, useEffect } from 'react'
 import FormInput from '../util/component/FormInput'
-import { Canvas, useFrame, render } from 'react-three-fiber'
+import * as _ from 'underscore'
+import { Canvas, useFrame, useThree, extend } from 'react-three-fiber'
 import * as THREE from 'three';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 function Boxes(props) {
   console.log(props)
   var d = 0;
@@ -38,7 +40,7 @@ function Box(props) {
   const rotateTest = () => {
     mesh.current.rotateX(THREE.Math.degToRad(90));
   }
-
+ let  randomColor = Math.floor(Math.random()*16777215).toString(16);
 
   return (
     <mesh
@@ -49,12 +51,22 @@ function Box(props) {
       onPointerOut={e => setHover(false)}
       userData={{ test: "hello" }}>
       <boxBufferGeometry attach="geometry" args={props.size} />
-      <meshStandardMaterial attach="material" color={hovered ? 'hotpink' : 'orange'} map ={new THREE.TextureLoader().load( '/boxtexture.png' )}  />
+      <meshStandardMaterial attach="material" color={hovered ? 'hotpink' : `#${randomColor}`}
+      //  map ={new THREE.TextureLoader().load( '/boxtexture.png' )} 
+       
+       />
 
     </mesh>
   )
 }
-
+const Cube = () => {
+  return (
+    <mesh>
+      <boxBufferGeometry attach="geometry" />
+      <meshBasicMaterial attach="material" color="hotpink" opacity={0.5} transparent />
+    </mesh>
+  )
+}
 const Terrain = () => {
 
   const mesh = useRef();
@@ -80,8 +92,23 @@ const Terrain = () => {
   );
 };
 
-
 const App = () => {
+  extend({ OrbitControls })
+  const Scene = () => {
+    const {
+      camera,
+      gl: { domElement }
+    } = useThree()
+    return (
+      <>
+           <Terrain>
+            
+            </Terrain>
+            <Boxes boxes={values.boxes} ></Boxes>
+        <orbitControls args={[camera, domElement]} />
+      </>
+    )
+  }
   const [height, setHeight] = useState(0)
   const [values, setValues] = useState({
     boxHeight: 1,
@@ -117,10 +144,18 @@ const App = () => {
      }
     }
     else {
-      z = values.zDistance  + 1.5;
+      z = values.zDistance  + values.boxLength;
     }
-
-    setValues({ ...values, boxes: [...values.boxes, { position: [values.xDistance, values.yDistance, values.zDistance], size: [values.boxWidth, values.boxHeight, values.boxLength] }], xDistance: x , yDistance: y, zDistance: z });
+   // console.log(_.random(1, 4)) 
+    setValues({ ...values, boxes: [...values.boxes, { position: [values.xDistance, values.yDistance, values.zDistance], size: [values.boxWidth, values.boxHeight, values.boxLength] }],
+       xDistance: x ,
+        yDistance: y,
+         zDistance: z ,
+         boxWidth:_.random(1, 3),
+         boxHeight:_.random(1, 3),
+         boxLength:_.random(1, 3)
+        
+        });
 
   }
   var camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight,1, 10000 );
@@ -129,6 +164,9 @@ const App = () => {
   camera.zoom=100
   // var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
 	// 			geometry.rotateX( - Math.PI / 2 );
+ 
+  // useRender(({ gl, canvas, scene, camera }) => console.log("i'm in the render-loop"))
+
   return (
     <div
     >
@@ -147,16 +185,14 @@ const App = () => {
         Current X: {values.xDistance} | Current Y: {values.yDistance} | Current Z: {values.zDistance}
       </form>
       <div ref={ref}>
-        <Canvas style={{height:500,width:800}}
+        <Canvas style={{height:500,width:800} }  resize={{scroll: true}}
           camera={{ ...camera }}	  >
 
           <ambientLight />
           <pointLight position={[10, 3, 1]} />
-          <Terrain>
-            
-          </Terrain>
-          <Boxes boxes={values.boxes} ></Boxes>
-         
+      
+
+        <Scene />
         </Canvas>
 
       </div>

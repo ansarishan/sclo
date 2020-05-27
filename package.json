@@ -10,7 +10,8 @@
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "react-three-fiber": "^4.2.4",
-    "three": "^0.116.1"
+    "three": "^0.116.1",
+    "underscore": "^1.10.2"
   },
   "scripts": {
     "start": "react-scripts start",

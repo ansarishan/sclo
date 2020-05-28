@@ -6,7 +6,7 @@ import { Canvas, useFrame, useThree, extend } from 'react-three-fiber'
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 function Boxes(props) {
-  console.log(props)
+ // console.log(props)
   var d = 0;
   return (
     <Fragment>
@@ -131,31 +131,55 @@ const App = () => {
   var d = 0;
   const addBoxes = (e) => {
     e.preventDefault()
+
+  let SameSizeBox =  values.boxes.filter(f=>f.key==`${values.boxWidth}|${values.boxHeight}|${values.boxLength}`);
+  let last = SameSizeBox.length;
+ 
+
+    let x1 = values.xDistance+values.boxWidth/2;
+    let y1 = values.yDistance+ values.boxHeight/2
+    let z1 = values.zDistance+values.boxLength/2;
     let x = values.xDistance;// + 1.5;
-    let y = values.yDistance;// + 1.5;
-    let z = values.zDistance;// + 1.5;
-    if(values.zDistance>9){
-      z = -10;
-     // x = values.xDistance + 1.5;
-      y = values.yDistance+1.5;
-     if(y>6){
+    let y = values.yDistance;
+    let z = values.zDistance+values.boxLength;// + 1.5;
+    if(z>8 && last==0){
+      
+       z = -10;
+      // x = -7;
+       y =y+ 3;
+     if(y>3){
       y = 0;
-      x = values.xDistance + 1.5;
+      x = x+3;
      }
     }
-    else {
-      z = values.zDistance  + values.boxLength;
+    if(last>0) {
+    
+
+        x1 = SameSizeBox[last-1].position[0];
+        y1 =SameSizeBox[last-1].position[1]  + values.boxHeight;
+        z1 = SameSizeBox[last-1].position[2];
+
+        setValues({ ...values, boxes: [...values.boxes, { position: [x1, y1,z1], size: [values.boxWidth, values.boxHeight, values.boxLength], key:`${values.boxWidth}|${values.boxHeight}|${values.boxLength}` }],
+       
+          boxWidth:_.random(1, 3),
+          boxHeight:_.random(1,3),
+          boxLength:_.random(1, 3)
+         
+         });
     }
+   else {
+    setValues({ ...values, boxes: [...values.boxes, { position: [x1, y1,z1], size: [values.boxWidth, values.boxHeight, values.boxLength], key:`${values.boxWidth}|${values.boxHeight}|${values.boxLength}` }],
+    xDistance: x ,
+     yDistance: y,
+      zDistance: z ,
+      boxWidth:_.random(1, 3),
+      boxHeight:_.random(1,3),
+      boxLength:_.random(1, 3)
+     
+     });
+   }
    // console.log(_.random(1, 4)) 
-    setValues({ ...values, boxes: [...values.boxes, { position: [values.xDistance, values.yDistance, values.zDistance], size: [values.boxWidth, values.boxHeight, values.boxLength] }],
-       xDistance: x ,
-        yDistance: y,
-         zDistance: z ,
-         boxWidth:_.random(1, 3),
-         boxHeight:_.random(1, 3),
-         boxLength:_.random(1, 3)
-        
-        });
+   
 
   }
   var camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight,1, 10000 );
